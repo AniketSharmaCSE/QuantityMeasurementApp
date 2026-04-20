@@ -13,12 +13,13 @@ using QuantityMeasurement.Repository.EF;
 using QuantityMeasurement.Repository.Interfaces;
 using QuantityMeasurement.Repository.Redis;
 using QuantityMeasurement.Api.Middleware;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var repoType = builder.Configuration["App:RepositoryType"] ?? "cache";
 
-// AppDbContext is always registered – the users table lives in SQL Server.
+// AppDbContext is always registered – the users table lives in PostgreSQL.
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
     builder.Configuration.GetConnectionString("DefaultConnection"),

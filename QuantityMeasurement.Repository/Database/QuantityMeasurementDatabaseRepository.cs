@@ -1,5 +1,5 @@
 using System.Data;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using QuantityMeasurement.Model.DTOs;
 using QuantityMeasurement.Repository.Interfaces;
 using QuantityMeasurement.Repository.Util;
@@ -7,7 +7,7 @@ using QuantityMeasurement.Repository.Util;
 namespace QuantityMeasurement.Repository.Database
 {
     // used by the ConsoleApp when RepositoryType = "database"
-    // uses raw SqlConnection/SqlCommand (UC16 style) instead of EF
+    // uses raw NpgsqlConnection/NpgsqlCommand instead of EF
     public class QuantityMeasurementDatabaseRepository : IQuantityMeasurementRepository
     {
         private readonly string _connectionString;
@@ -19,9 +19,9 @@ namespace QuantityMeasurement.Repository.Database
             EnsureTableExists();
         }
 
-        private SqlConnection OpenConnection()
+        private NpgsqlConnection OpenConnection()
         {
-            var conn = new SqlConnection(_connectionString);
+            var conn = new NpgsqlConnection(_connectionString);
             conn.Open();
             Interlocked.Increment(ref _activeConnections);
             return conn;
@@ -34,24 +34,23 @@ namespace QuantityMeasurement.Repository.Database
                 using var conn = OpenConnection();
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = @"
-                    IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'quantity_measurements_ef')
-                    CREATE TABLE quantity_measurements_ef (
-                        Id               UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-                        Operation        NVARCHAR(50)  NOT NULL,
-                        Operand1Value    FLOAT,
-                        Operand1Unit     NVARCHAR(MAX),
-                        Operand1Category NVARCHAR(450),
-                        Operand2Value    FLOAT,
-                        Operand2Unit     NVARCHAR(MAX),
-                        Operand2Category NVARCHAR(MAX),
-                        ResultValue      FLOAT,
-                        ResultUnit       NVARCHAR(MAX),
-                        ResultCategory   NVARCHAR(MAX),
-                        BoolResult       BIT,
-                        ScalarResult     FLOAT,
-                        HasError         BIT NOT NULL DEFAULT 0,
-                        ErrorMessage     NVARCHAR(MAX),
-                        Timestamp        DATETIME2 NOT NULL DEFAULT GETUTCDATE()
+                    CREATE TABLE IF NOT EXISTS quantity_measurements_ef (
+                        ""Id""               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        ""Operation""        VARCHAR(50)  NOT NULL,
+                        ""Operand1Value""    DOUBLE PRECISION,
+                        ""Operand1Unit""     TEXT,
+                        ""Operand1Category"" TEXT,
+                        ""Operand2Value""    DOUBLE PRECISION,
+                        ""Operand2Unit""     TEXT,
+                        ""Operand2Category"" TEXT,
+                        ""ResultValue""      DOUBLE PRECISION,
+                        ""ResultUnit""       TEXT,
+                        ""ResultCategory""   TEXT,
+                        ""BoolResult""       BOOLEAN,
+                        ""ScalarResult""     DOUBLE PRECISION,
+                        ""HasError""         BOOLEAN NOT NULL DEFAULT FALSE,
+                        ""ErrorMessage""     TEXT,
+                        ""Timestamp""        TIMESTAMP NOT NULL DEFAULT NOW()
                     )";
                 cmd.ExecuteNonQuery();
             }
@@ -64,10 +63,10 @@ namespace QuantityMeasurement.Repository.Database
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
                 INSERT INTO quantity_measurements_ef
-                    (Operation, Operand1Value, Operand1Unit, Operand1Category,
-                     Operand2Value, Operand2Unit, Operand2Category,
-                     ResultValue, ResultUnit, ResultCategory,
-                     BoolResult, ScalarResult, HasError, ErrorMessage, Timestamp)
+                    (""Operation"", ""Operand1Value"", ""Operand1Unit"", ""Operand1Category"",
+                     ""Operand2Value"", ""Operand2Unit"", ""Operand2Category"",
+                     ""ResultValue"", ""ResultUnit"", ""ResultCategory"",
+                     ""BoolResult"", ""ScalarResult"", ""HasError"", ""ErrorMessage"", ""Timestamp"")
                 VALUES
                     (@op, @v1, @u1, @c1, @v2, @u2, @c2,
                      @rv, @ru, @rc, @br, @sr, @err, @errmsg, @ts)";
@@ -94,7 +93,7 @@ namespace QuantityMeasurement.Repository.Database
         {
             using var conn = OpenConnection();
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM quantity_measurements_ef ORDER BY Timestamp DESC";
+            cmd.CommandText = @"SELECT * FROM quantity_measurements_ef ORDER BY ""Timestamp"" DESC";
             return ReadResults(cmd);
         }
 
@@ -102,7 +101,7 @@ namespace QuantityMeasurement.Repository.Database
         {
             using var conn = OpenConnection();
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = $"SELECT TOP {count} * FROM quantity_measurements_ef ORDER BY Timestamp DESC";
+            cmd.CommandText = $@"SELECT * FROM quantity_measurements_ef ORDER BY ""Timestamp"" DESC LIMIT {count}";
             return ReadResults(cmd);
         }
 
@@ -110,7 +109,7 @@ namespace QuantityMeasurement.Repository.Database
         {
             using var conn = OpenConnection();
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM quantity_measurements_ef WHERE LOWER(Operation) = LOWER(@op) ORDER BY Timestamp DESC";
+            cmd.CommandText = @"SELECT * FROM quantity_measurements_ef WHERE LOWER(""Operation"") = LOWER(@op) ORDER BY ""Timestamp"" DESC";
             cmd.Parameters.AddWithValue("@op", operation);
             return ReadResults(cmd);
         }
@@ -119,7 +118,7 @@ namespace QuantityMeasurement.Repository.Database
         {
             using var conn = OpenConnection();
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM quantity_measurements_ef WHERE LOWER(Operand1Category) = LOWER(@cat) ORDER BY Timestamp DESC";
+            cmd.CommandText = @"SELECT * FROM quantity_measurements_ef WHERE LOWER(""Operand1Category"") = LOWER(@cat) ORDER BY ""Timestamp"" DESC";
             cmd.Parameters.AddWithValue("@cat", category);
             return ReadResults(cmd);
         }
@@ -129,11 +128,11 @@ namespace QuantityMeasurement.Repository.Database
             using var conn = OpenConnection();
             using var cmd = conn.CreateCommand();
             cmd.CommandText = "SELECT COUNT(*) FROM quantity_measurements_ef";
-            return (int)cmd.ExecuteScalar()!;
+            return Convert.ToInt32(cmd.ExecuteScalar()!);
         }
 
         public string GetPoolStatistics() =>
-            $"SQL Server - active connections: {_activeConnections}, total records: {GetTotalCount()}";
+            $"PostgreSQL - active connections: {_activeConnections}, total records: {GetTotalCount()}";
 
         public void Clear()
         {
@@ -145,7 +144,7 @@ namespace QuantityMeasurement.Repository.Database
 
         public void ReleaseResources() { }
 
-        private static IReadOnlyList<QuantityResponseDTO> ReadResults(SqlCommand cmd)
+        private static IReadOnlyList<QuantityResponseDTO> ReadResults(NpgsqlCommand cmd)
         {
             var list = new List<QuantityResponseDTO>();
             using var reader = cmd.ExecuteReader();
