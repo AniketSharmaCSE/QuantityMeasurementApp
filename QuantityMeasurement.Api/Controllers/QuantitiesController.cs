@@ -11,7 +11,7 @@ namespace QuantityMeasurement.Api.Controllers
     // Operation field (on /calculate) selects: Add, Subtract, Divide.
     // Temperature only supports compare and convert.
     [ApiController]
-    [Authorize]
+    [AllowAnonymous]
     [Route("api/v1/quantities")]
     public class QuantitiesController : ControllerBase
     {

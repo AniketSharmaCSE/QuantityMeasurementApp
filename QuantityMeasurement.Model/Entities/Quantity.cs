@@ -20,11 +20,9 @@ namespace QuantityMeasurement.Model.Entities
             { "Centimeters", 0.032808399 },
 
             // WeightUnit -> Gram as base
-            { "Milligram",   0.001 },
             { "Gram",        1.0 },
             { "Kilogram",    1000.0 },
             { "Pound",       453.592 },
-            { "Tonne",       1_000_000.0 },
 
             // VolumeUnit -> Litre as base
             { "Litre",       1.0 },

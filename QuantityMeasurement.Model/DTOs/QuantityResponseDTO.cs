@@ -62,7 +62,7 @@ namespace QuantityMeasurement.Model.DTOs
                 Operand1   = operand1,
                 Operand2   = operand2,
                 BoolResult = isEqual,
-                Result     = new QuantityDTO(isEqual ? 1 : 0, "Result", "Comparison")
+                Result     = new QuantityDTO(0, isEqual ? "Equal" : "NotEqual", "Comparison")
             };
         }
 

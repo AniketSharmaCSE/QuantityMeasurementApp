@@ -18,15 +18,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 var repoType = builder.Configuration["App:RepositoryType"] ?? "cache";
 
-// AppDbContext is registered once regardless of repo type because
-// the users table always lives in SQL Server (auth needs it).
-// Fixed: was registered twice in non-database mode which caused a DI conflict.
+// AppDbContext is always registered – the users table lives in SQL Server.
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly("QuantityMeasurement.Api")));
 
-// Measurement repository - swap via App:RepositoryType in appsettings.json
+// Measurement repository – swap via App:RepositoryType in appsettings.json
 if (repoType.Equals("database", StringComparison.OrdinalIgnoreCase))
 {
     builder.Services.AddScoped<IQuantityMeasurementRepository>(sp =>
@@ -46,10 +44,16 @@ else
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IQuantityService, QuantityService>();
 
-// JWT
+//  Authentication 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = "ExternalCookie"; // Required for Google
+    })
+    .AddCookie("ExternalCookie")
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -62,6 +66,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience            = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
+    })
+    // UC18: Google OAuth2
+    // Requires Google:ClientId and Google:ClientSecret in appsettings.json 
+    .AddGoogle(options =>
+    {
+        options.ClientId     = builder.Configuration["Google:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Google:ClientSecret"]!;
     });
 
 builder.Services.AddAuthorization();
@@ -74,12 +85,14 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title       = "Quantity Measurement API",
         Version     = "v1",
-        Description = "REST API for quantity measurements - UC17.\n\n" +
+        Description = "REST API for quantity measurements - UC18.\n\n" +
                       "How to authenticate:\n" +
                       "1. POST /api/v1/auth/register to create an account\n" +
                       "2. POST /api/v1/auth/login with your credentials\n" +
                       "3. Copy the returned token\n" +
-                      "4. Click the Authorize button and paste it"
+                      "4. Click the Authorize button and paste it\n\n" +
+                      "Google OAuth2 (UC18):\n" +
+                      "Open GET /api/v1/auth/google in your browser to sign in with Google."
     });
 
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -118,19 +131,17 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Ensure tables exist on startup.
-// Fixed: was crashing if SQL Server unavailable - now wrapped in try/catch.
-// Cache/Redis modes continue normally even if the DB is offline.
 using (var scope = app.Services.CreateScope())
 {
     try
     {
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         db.Database.EnsureCreated();
-        Console.WriteLine("[UC17] Database tables ready.");
+        Console.WriteLine("[UC18] Database tables ready.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"[UC17] DB not available ({ex.Message}). Running in {repoType} mode.");
+        Console.WriteLine($"[UC18] DB not available ({ex.Message}). Running in {repoType} mode.");
     }
 }
 

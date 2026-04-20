@@ -77,11 +77,11 @@ namespace QuantityMeasurement.BusinessLayer.Services
 
                 bool result = q1.Equals(q2);
 
-                var response = QuantityResponseDTO.ForArithmetic(
+                var response = QuantityResponseDTO.ForComparison(
                     "Compare",
                     new QuantityDTO(v1, u1, "Length"),
                     new QuantityDTO(v2, u2, "Length"),
-                    new QuantityDTO(result ? 1 : 0, "Result", "Comparison")
+                    result
                 );
 
                 repo.Save(response);
@@ -169,7 +169,7 @@ namespace QuantityMeasurement.BusinessLayer.Services
             }
         }
 
-        // ===== WEIGHT =====
+        //  WEIGHT 
 
         public QuantityResponseDTO AddWeight(double v1, string u1, double v2, string u2)
         {
@@ -272,11 +272,11 @@ namespace QuantityMeasurement.BusinessLayer.Services
                 bool result = new Quantity<WeightUnit>(v1, Enum.Parse<WeightUnit>(u1))
                     .Equals(new Quantity<WeightUnit>(v2, Enum.Parse<WeightUnit>(u2)));
 
-                var response = QuantityResponseDTO.ForArithmetic(
-                    "CompareWeight",
+                var response = QuantityResponseDTO.ForComparison(
+                    "Compare",
                     new QuantityDTO(v1, u1, "Weight"),
                     new QuantityDTO(v2, u2, "Weight"),
-                    new QuantityDTO(result ? 1 : 0, "Boolean", "Comparison")
+                    result
                 );
 
                 repo.Save(response);
@@ -284,11 +284,11 @@ namespace QuantityMeasurement.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                return QuantityResponseDTO.ForError("CompareWeight", ex.Message);
+                return QuantityResponseDTO.ForError("Compare", ex.Message);
             }
         }
 
-        // ===== VOLUME =====
+        //  VOLUME 
 
         public QuantityResponseDTO AddVolume(double v1, string u1, double v2, string u2)
         {
@@ -348,7 +348,7 @@ namespace QuantityMeasurement.BusinessLayer.Services
                 var result = q1.Divide(q2);
 
                 var response = QuantityResponseDTO.ForArithmetic(
-                    "DivideVolume",
+                    "Divide Volume",
                     new QuantityDTO(v1, u1, "Volume"),
                     new QuantityDTO(v2, u2, "Volume"),
                     new QuantityDTO(result, "Scalar", "Division")
@@ -391,11 +391,11 @@ namespace QuantityMeasurement.BusinessLayer.Services
                 bool result = new Quantity<VolumeUnit>(v1, Enum.Parse<VolumeUnit>(u1))
                     .Equals(new Quantity<VolumeUnit>(v2, Enum.Parse<VolumeUnit>(u2)));
 
-                var response = QuantityResponseDTO.ForArithmetic(
-                    "CompareVolume",
+                var response = QuantityResponseDTO.ForComparison(
+                    "Compare",
                     new QuantityDTO(v1, u1, "Volume"),
                     new QuantityDTO(v2, u2, "Volume"),
-                    new QuantityDTO(result ? 1 : 0, "Boolean", "Comparison")
+                    result
                 );
 
                 repo.Save(response);
@@ -403,11 +403,11 @@ namespace QuantityMeasurement.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                return QuantityResponseDTO.ForError("CompareVolume", ex.Message);
+                return QuantityResponseDTO.ForError("Compare", ex.Message);
             }
         }
 
-        // ===== TEMPERATURE =====
+        //  TEMPERATURE 
 
         private TemperatureUnit ParseTemperatureUnit(string unit)
         {
@@ -448,11 +448,11 @@ namespace QuantityMeasurement.BusinessLayer.Services
                 bool result = new Quantity<TemperatureUnit>(v1, ParseTemperatureUnit(u1))
                     .Equals(new Quantity<TemperatureUnit>(v2, ParseTemperatureUnit(u2)));
 
-                var response = QuantityResponseDTO.ForArithmetic(
-                    "CompareTemperature",
+                var response = QuantityResponseDTO.ForComparison(
+                    "Compare",
                     new QuantityDTO(v1, u1, "Temperature"),
                     new QuantityDTO(v2, u2, "Temperature"),
-                    new QuantityDTO(result ? 1 : 0, "Boolean", "Comparison")
+                    result
                 );
 
                 repo.Save(response);
@@ -460,7 +460,7 @@ namespace QuantityMeasurement.BusinessLayer.Services
             }
             catch (Exception ex)
             {
-                return QuantityResponseDTO.ForError("CompareTemperature", ex.Message);
+                return QuantityResponseDTO.ForError("Compare", ex.Message);
             }
         }
 

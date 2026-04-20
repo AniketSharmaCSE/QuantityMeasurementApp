@@ -13,9 +13,13 @@ namespace QuantityMeasurement.Model.DTOs.Auth
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
+        // Min 6 chars, at least one uppercase, one digit, one special character
         [Required]
-        [MinLength(6)]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?]).{6,}$",
+            ErrorMessage = "Password must be at least 6 characters and include one uppercase letter, one number, and one special character.")]
         public string Password { get; set; } = string.Empty;
+
+        public string Name { get; set; } = string.Empty;
     }
 
     public class LoginRequestDTO
@@ -32,6 +36,7 @@ namespace QuantityMeasurement.Model.DTOs.Auth
         public string Token { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public DateTime ExpiresAt { get; set; }
         public string Message { get; set; } = string.Empty;
     }

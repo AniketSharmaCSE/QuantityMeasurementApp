@@ -1,450 +1,115 @@
-# QuantityMeasurementApp
+Quantity Measurement App
+Overview
 
-## Overview
+The Quantity Measurement App is a progressive, incremental project designed to compare, convert, and perform arithmetic on different quantities such as length, weight, and other measurable units.
 
-QuantityMeasurementApp is a C# application designed to model and manipulate physical measurements such as length, weight, volume, and temperature. The application supports equality comparison, unit conversion, arithmetic operations, and database persistence while demonstrating strong software design principles and scalable architecture.
+The application is built step by step using clearly defined use cases. Each use case adds a small, focused piece of functionality. The goal is to keep the codebase maintainable, testable, and extensible.
 
-The system evolves progressively through multiple use cases (UC1–UC18). Each use case incrementally improves the architecture and introduces new capabilities.
+The project starts with simple comparisons and gradually evolves to support:
 
-The project demonstrates the following software engineering principles:
+Unit equality checks
 
-- Object-Oriented Programming (OOP)
-- DRY (Don't Repeat Yourself)
-- SOLID Principles
-- Generic Programming
-- Immutability
-- N-Tier Architecture
-- Database Integration using ADO.NET and Entity Framework Core
-- RESTful API Design
-- JWT-Based Authentication and Authorization
+Unit conversions
 
-The application begins with simple measurement comparisons and evolves into a fully secured, production-ready REST API with user authentication.
+Arithmetic operations on quantities
 
----
+Multiple measurement categories (e.g., length, weight, etc.)
 
-# Use Cases
+Project Goals
 
----
+Build a clean and extensible Quantity Measurement API
 
-# UC1: Feet Measurement Equality
+Follow incremental development using use cases
 
-## Description
+Apply OOP principles and good design practices
 
-This use case introduces the basic functionality for comparing two length measurements expressed in feet.
+Support unit testing for all core behaviors
 
-## Features
+Keep the implementation focused on requirements
 
-- Compares two values measured in feet
-- Handles null comparisons safely
-- Ensures type-safe comparisons
-- Validates numeric inputs
+Features (Planned & Implemented)
 
-## Concepts Applied
+✅ Compare two quantities of the same type (e.g., feet vs feet, inches vs inches)
 
-- Equality comparison
-- Defensive programming
-- Basic object-oriented modeling
+✅ Compare quantities of different units within the same category (e.g., feet vs inches)
 
----
+✅ Convert between supported units
 
-# UC2: Feet and Inches Equality
+✅ Add two quantities of the same category
 
-## Description
+⏳ Extend to more quantity types (e.g., weight, volume, etc.)
 
-This use case extends the system by introducing inches as an additional unit of measurement.
+⏳ Support more arithmetic operations
 
-## Features
+Supported Concepts
 
-- Supports multiple length units
-- Enables comparison between different units
-- Performs validation and type checking
-- Expands the measurement model
+Measurement categories (e.g., Length, later Weight, etc.)
 
-## Concepts Applied
+Units within a category (e.g., Feet, Inches, Yards, Centimeters)
 
-- Multi-unit measurement handling
-- Cross-unit comparison
-- Input validation
+Conversion using a common base unit
 
----
+Equality checks with proper value normalization
 
-# UC3: Generic Quantity Class (DRY Principle)
+Arithmetic operations using consistent units
 
-## Description
+Development Approach
 
-This use case introduces a reusable quantity class representing measurements using a numeric value and an associated unit.
+The app is developed use case by use case
 
-## Features
+Each use case:
 
-- Introduces a reusable quantity representation
-- Introduces an enumeration for supported length units
-- Removes duplicated comparison logic
-- Supports cross-unit equality comparison
+Introduces a small, well-defined feature
 
-## Concepts Applied
+Adds or updates tests
 
-- DRY principle
-- Encapsulation
-- Enumeration-based unit representation
-- Value-based equality
+Extends the existing design without breaking previous behavior
 
----
+This keeps the project:
 
-# UC4: Extended Unit Support
+Easy to understand
 
-## Description
+Easy to test
 
-This use case expands the system to support additional units without changing the core equality logic.
+Easy to extend
 
-## Features
+Tech Stack
 
-- Adds additional length units
-- Maintains compatibility with existing logic
-- Demonstrates extensibility of the system
+Language: C#
 
-## Concepts Applied
+Framework: .NET
 
-- Scalable design
-- Enum extensibility
-- Open-Closed Principle
+Testing: NUnit
 
----
+IDE: VS Code
 
-# UC5: Unit-to-Unit Conversion
+Project Structure 
 
-## Description
+QuantityMeasurementApp/
 
-This use case introduces a conversion mechanism allowing measurements to be converted between different units.
+Core domain classes (Quantity, Units, Converters, etc.)
 
-## Features
+QuantityMeasurementAppTests/
 
-- Converts values between supported units
-- Uses base-unit normalization
-- Ensures accurate conversion calculations
-- Provides reusable conversion functionality
+Unit tests for all use cases
 
-## Concepts Applied
+Solution file (.sln / .slnx)
 
-- Base unit normalization
-- Conversion abstraction
-- Precision handling
+How to Run
 
----
+Clone the repository
 
-# UC6: Addition of Two Length Units
+Open the solution in VS Code
 
-## Description
+Restore dependencies
 
-This use case introduces arithmetic addition between measurement quantities.
+Build the solution
 
-## Features
+Run the application or execute the test suite
 
-- Supports addition of quantities within the same category
-- Performs automatic unit conversion before calculation
-- Maintains immutability of measurement objects
-- Returns results in a consistent unit representation
+Using CLI:
 
-## Concepts Applied
-
-- Arithmetic operations on value objects
-- Unit normalization
-- Immutable object design
-
----
-
-# UC7: Addition with Target Unit Specification
-
-## Description
-
-This use case enhances addition functionality by allowing results to be returned in a specified unit.
-
-## Features
-
-- Supports specifying a target unit
-- Uses method overloading for flexible operations
-- Performs necessary conversion before returning results
-
-## Concepts Applied
-
-- Method overloading
-- Flexible API design
-- Conversion abstraction
-
----
-
-# UC8: Subtraction of Two Length Units
-
-## Description
-
-This use case introduces subtraction between measurement quantities.
-
-## Features
-
-- Supports subtraction between quantities
-- Performs automatic unit conversion
-- Supports negative results
-- Maintains object immutability
-
-## Concepts Applied
-
-- Arithmetic subtraction
-- Floating-point tolerance handling
-- Immutable value objects
-
----
-
-# UC9: Multi-Category Measurement Support
-
-## Description
-
-This use case expands the application to support multiple measurement categories.
-
-Separate classes represent different measurement types.
-
-## Features
-
-- Supports length, volume, and weight measurements
-- Each category defines its own units
-- Prevents cross-category arithmetic operations
-- Maintains strong type safety
-
-## Concepts Applied
-
-- Domain modeling
-- Category separation
-- Type-safe measurement handling
-
----
-
-# UC10: Generic Quantity Class with Unit Interface
-
-## Description
-
-This use case refactors the multi-category architecture using generics and a common unit interface.
-
-## Features
-
-- Introduces a generic quantity class
-- Introduces a shared unit interface
-- Eliminates duplicated logic across measurement categories
-- Supports extensibility for future categories
-
-## Concepts Applied
-
-- Generic programming
-- Interface abstraction
-- Open-Closed Principle
-
----
-
-# UC11: Multi-Category Measurement Using Generic Quantity
-
-## Description
-
-This use case improves the generic architecture by enforcing compile-time type safety for measurement operations.
-
-## Features
-
-- Uses generics to represent measurement categories
-- Ensures operations occur only between compatible quantities
-- Supports scalable measurement modeling
-
-## Concepts Applied
-
-- Type-safe generics
-- Interface-based design
-- Reusable domain architecture
-
----
-
-# UC12: Arithmetic Operations on Quantities
-
-## Description
-
-This use case introduces arithmetic operations for generic quantities.
-
-## Features
-
-- Supports addition, subtraction, and division
-- Performs base unit conversion before arithmetic operations
-- Allows result unit specification
-- Maintains immutability and validation
-
-## Concepts Applied
-
-- Generic arithmetic operations
-- Unit normalization
-- Domain logic encapsulation
-
----
-
-# UC13: Centralized Arithmetic Logic (DRY Principle)
-
-## Description
-
-This use case refactors arithmetic operations to eliminate duplicated logic.
-
-## Features
-
-- Introduces a centralized arithmetic processing method
-- Uses an operation enumeration to determine arithmetic behavior
-- Ensures consistent validation and conversion
-
-## Concepts Applied
-
-- DRY principle
-- Centralized processing
-- Maintainable architecture
-
----
-
-# UC14: Temperature Measurement with Selective Arithmetic Support
-
-## Description
-
-This use case introduces temperature measurement support while restricting unsupported arithmetic operations.
-
-## Features
-
-- Adds temperature measurement support
-- Allows equality checks and conversions
-- Prevents unsupported arithmetic operations
-- Provides controlled operation validation
-
-## Concepts Applied
-
-- Selective capability implementation
-- Interface-based feature control
-- Safe operation validation
-
----
-
-# UC15: N-Tier Architecture Refactoring
-
-## Description
-
-This use case restructures the application into an N-Tier architecture to improve scalability, maintainability, and separation of concerns.
-
-## Architecture Layers
-
-### Presentation Layer
-
-Handles user interaction and presentation logic.
-
-### Service Layer
-
-Contains business logic and orchestrates measurement operations.
-
-### Repository Layer
-
-Handles data access and persistence operations.
-
-### Domain Model Layer
-
-Contains core domain objects such as quantities and unit definitions.
-
-## Key Architectural Concepts
-
-### Data Transfer Objects
-
-DTOs transfer data between layers without exposing internal domain objects.
-
-### Dependency Injection
-
-Dependencies are provided to components instead of being created internally.
-
-### Error Handling as Data
-
-Errors are represented as structured responses rather than uncontrolled exceptions.
-
-### Immutability
-
-Measurement objects remain immutable to ensure consistent behavior.
-
-## SOLID Principles Applied
-
-- Single Responsibility Principle
-- Open Closed Principle
-- Liskov Substitution Principle
-- Interface Segregation Principle
-- Dependency Inversion Principle
-
-## Benefits
-
-- Improved maintainability
-- Improved testability
-- Better separation of concerns
-- Scalable architecture
-
----
-
-# UC16: Database Integration with ADO.NET
-
-## Description
-
-This use case integrates database persistence into the application using ADO.NET. Measurement operations and results can now be stored and retrieved from a relational database.
-
-## Features
-
-- Database connectivity using ADO.NET
-- Connection pooling and parameterized SQL queries
-- Structured exception handling
-- Separation of persistence logic from business logic
-- Externalized connection string configuration
-
-## Concepts Applied
-
-- ADO.NET data access
-- Repository pattern
-- Configuration management
-- Transaction management
-
----
-
-# UC17: REST API with ASP.NET Core and Entity Framework Core
-
-## Description
-
-This use case transforms the console application into a REST API using ASP.NET Core. All existing business logic and architectural patterns are preserved while the persistence layer is modernized with Entity Framework Core and functionality is exposed through HTTP endpoints.
-
-## Features
-
-- RESTful endpoints for compare, convert, and calculate across all four categories
-- EF Core replaces ADO.NET with code-first migrations
-- Swappable repository modes: EF Core (SQL Server), Redis, and in-memory cache
-- Repository type configurable via `appsettings.json`
-- Swagger UI for API documentation and testing
-- Global exception handling middleware
-- History and statistics endpoints
-
-## Concepts Applied
-
-- RESTful API design
-- Entity Framework Core
-- Repository pattern with swappable implementations
-- ASP.NET Core middleware pipeline
-- DTO-based request and response modeling
-
----
-
-# UC18: JWT-Based User Authentication and Authorization
-
-## Description
-
-This use case secures the REST API by introducing user authentication using JSON Web Tokens. Users must register and log in to receive a token, which is required to access all measurement endpoints.
-
-## Features
-
-- User registration with BCrypt password hashing
-- Login returns a signed JWT bearer token
-- All endpoints protected with `[Authorize]`
-- Duplicate username and email validation at registration
-- Token expiry configurable via `appsettings.json`
-- Swagger UI configured with Bearer token support
-
-## Concepts Applied
-
-- JWT authentication and authorization
-- BCrypt password hashing
-- Claims-based identity
-- ASP.NET Core authentication middleware
+dotnet restore
+dotnet build
+dotnet test
+dotnet run

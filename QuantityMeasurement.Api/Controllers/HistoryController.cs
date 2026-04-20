@@ -6,7 +6,6 @@ using QuantityMeasurement.Model.DTOs;
 namespace QuantityMeasurement.Api.Controllers
 {
     // All history access goes through a single endpoint with optional query filters.
-    // Fixed: was injecting IQuantityMeasurementRepository directly, now uses IQuantityService.
     [ApiController]
     [Authorize]
     [Route("api/v1/history")]
