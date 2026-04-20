@@ -20,9 +20,9 @@ var repoType = builder.Configuration["App:RepositoryType"] ?? "cache";
 
 // AppDbContext is always registered – the users table lives in SQL Server.
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("QuantityMeasurement.Api")));
+    options.UseNpgsql(
+    builder.Configuration.GetConnectionString("DefaultConnection"),
+    b => b.MigrationsAssembly("QuantityMeasurement.Api")));
 
 // Measurement repository – swap via App:RepositoryType in appsettings.json
 if (repoType.Equals("database", StringComparison.OrdinalIgnoreCase))
